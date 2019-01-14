@@ -59,7 +59,7 @@ class ParameterNoiseSampling(BanditAlgorithm):
     self.num_epochs = hparams.training_epochs
 
     self.data_h = ContextualDataset(hparams.context_dim, hparams.num_actions,
-                                    hparams.buffer_s)
+                                    hparams.buffer_s,bootstrap=getattr(hparams,'bootstrap',None))
     self.bnn = NeuralBanditModel(self.optimizer, hparams, '{}-bnn'.format(name))
 
     with self.bnn.graph.as_default():

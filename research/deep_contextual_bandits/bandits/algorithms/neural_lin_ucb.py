@@ -37,6 +37,7 @@ class NeuralLinUCB(BanditAlgorithm):
     self.num_epochs = hparams.training_epochs
     self.data_h = ContextualDataset(hparams.context_dim,
                                     hparams.num_actions,
+                                    bootstrap=getattr(hparams,'bootstrap',None),
                                     intercept=False)
 
     self.bnn = NeuralBanditModel(optimizer, hparams, '{}-bnn'.format(name))

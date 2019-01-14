@@ -53,7 +53,7 @@ class PosteriorBNNSampling(BanditAlgorithm):
     self.training_epochs = hparams.training_epochs
     self.t = 0
     self.data_h = ContextualDataset(hparams.context_dim, hparams.num_actions,
-                                    hparams.buffer_s)
+                                    hparams.buffer_s,bootstrap=getattr(hparams,'bootstrap',None))
 
     # to be extended with more BNNs (BB alpha-div, GPs, SGFS, constSGD...)
     bnn_name = '{}-bnn'.format(name)

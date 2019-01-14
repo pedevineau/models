@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from data.bootstrap_thompson_sampling import generate_artificial_data
+from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
 
 
 class ContextualDataset(object):
@@ -50,8 +50,8 @@ class ContextualDataset(object):
     self.buffer_s = buffer_s
     self.intercept = intercept
 
-    if bootstrap is not None:
-      contexts, actions, rewards = generate_artificial_data(50)
+    if bootstrap is not None: # generate_artificial_data
+      contexts, actions, rewards = bootstrap()
       for n, reward in enumerate(rewards):
         self.add(contexts[n], actions[n], reward)
 

@@ -54,11 +54,12 @@ from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampl
 # from bandits.algorithms.parameter_noise_sampling import ParameterNoiseSampling
 from bandits.algorithms.posterior_bnn_sampling import PosteriorBNNSampling
 from bandits.data.synthetic_data_sampler import sample_linear_data
+from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
+
 from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampling
 # from bandits.data.synthetic_data_sampler import sample_sparse_linear_data
 # from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
 from bandits.algorithms.uniform_sampling import UniformSampling
-
 
 base_route = os.getcwd()
 data_route = 'contextual_bandits/datasets'
@@ -82,6 +83,7 @@ def dataset_proto():
                                                 num_actions, sigma=noise_stds)
     return dataset, opt_linear
 
+artificial_data_generator = lambda : generate_artificial_data(n_samples=50, n_actions=num_actions, n_features=context_dim)
 # Params for algo templates
 hparams = tf.contrib.training.HParams(num_actions=num_actions)
 
@@ -109,7 +111,8 @@ hparams_rms = tf.contrib.training.HParams(num_actions=num_actions,
                                         reset_lr=True,
                                         lr_decay_rate=0.5,
                                         training_freq=50,
-                                        training_epochs=50)
+                                        training_epochs=50,
+                                        bootstrap=artificial_data_generator)
 
 
 
@@ -130,11 +133,12 @@ hparams_rms2 = tf.contrib.training.HParams(num_actions=num_actions,
                                         reset_lr=True,
                                         lr_decay_rate=0.5,
                                         training_freq=50,
-                                        training_epochs=50)
+                                        training_epochs=50,
+                                        bootstrap=artificial_data_generator)
 
 hparams_linucb = tf.contrib.training.HParams(num_actions=num_actions,
                                         context_dim=context_dim,
-                                        alpha=0.1,
+                                        alpha=1,
                                         lam=0.1)
 
 hparams_neural_linucb = tf.contrib.training.HParams(num_actions=num_actions,
@@ -156,7 +160,8 @@ hparams_neural_linucb = tf.contrib.training.HParams(num_actions=num_actions,
                                         training_freq=50,
                                         training_epochs=50,
                                         training_freq_network=50,
-                                        alpha=0.1,
+                                        bootstrap=artificial_data_generator,
+                                        alpha=1,
                                         lam=0.1)
 hparams_neural_linthomson = tf.contrib.training.HParams(num_actions=num_actions,
                                         context_dim=context_dim,
@@ -176,6 +181,7 @@ hparams_neural_linthomson = tf.contrib.training.HParams(num_actions=num_actions,
                                         training_freq=50,
                                         training_epochs=50,
                                         training_freq_network=50,
+                                        bootstrap=artificial_data_generator,
                                         a0=6,
                                         b0=6,
                                         lambda_prior=0.25,
@@ -202,7 +208,7 @@ algo_protos = [linUCB_proto,neuralLinUCB_proto, neuralLinThomson_proto, linEps_p
 
 
 # Run experiments several times save and plot results
-benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, nb_contexts=num_contexts, test_name='linear_test4_noise_1_00')
+benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, nb_contexts=num_contexts, test_name='linear_testbootstrap_noise_1_00')
 
 benchmarker.run_experiments(5)
 benchmarker.save_results('./results/')

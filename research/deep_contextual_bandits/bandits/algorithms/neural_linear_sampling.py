@@ -69,11 +69,18 @@ class NeuralLinearPosteriorSampling(BanditAlgorithm):
     self.num_epochs = hparams.training_epochs
     self.data_h = ContextualDataset(hparams.context_dim,
                                     hparams.num_actions,
+                                    bootstrap=getattr(hparams,'bootstrap',None),
                                     intercept=False)
     self.latent_h = ContextualDataset(self.latent_dim,
                                       hparams.num_actions,
                                       intercept=False)
+    # print(self.latent_h.actions)
     self.bnn = NeuralBanditModel(optimizer, hparams, '{}-bnn'.format(name))
+
+    if getattr(hparams,'bootstrap',None) is not None:
+        new_z = self.bnn.sess.run(self.bnn.nn,
+                                  feed_dict={self.bnn.x: self.data_h.contexts})
+        self.latent_h.replace_data(contexts=new_z, actions=self.data_h.actions, rewards=self.data_h.rewards)
 
   def action(self, context):
     """Samples beta's from posterior, and chooses best action accordingly."""

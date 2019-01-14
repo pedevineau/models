@@ -55,7 +55,8 @@ class BootstrappedBNNSampling(BanditAlgorithm):
     self.datasets = [
         ContextualDataset(hparams.context_dim,
                           hparams.num_actions,
-                          hparams.buffer_s)
+                          hparams.buffer_s,
+                          bootstrap=getattr(hparams,'bootstrap',None))
         for _ in range(self.q)
     ]
 

@@ -71,6 +71,7 @@ class LinearFullPosteriorSampling(BanditAlgorithm):
     self.t = 0
     self.data_h = ContextualDataset(hparams.context_dim,
                                     hparams.num_actions,
+                                    bootstrap=getattr(hparams,'bootstrap',None),
                                     intercept=True)
 
   def action(self, context):

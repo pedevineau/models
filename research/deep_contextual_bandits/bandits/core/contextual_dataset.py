@@ -21,11 +21,13 @@ from __future__ import print_function
 
 import numpy as np
 
+from data.bootstrap_thompson_sampling import generate_artificial_data
+
 
 class ContextualDataset(object):
   """The buffer is able to append new data, and sample random minibatches."""
 
-  def __init__(self, context_dim, num_actions, buffer_s=-1, intercept=False):
+  def __init__(self, context_dim, num_actions, buffer_s=-1, intercept=False, bootstrap=None):
     """Creates a ContextualDataset object.
 
     The data is stored in attributes: contexts and rewards.
@@ -47,6 +49,12 @@ class ContextualDataset(object):
     self.actions = []
     self.buffer_s = buffer_s
     self.intercept = intercept
+
+    if bootstrap is not None:
+      contexts, actions, rewards = generate_artificial_data()
+      for n, reward in enumerate(rewards):
+        self.add(contexts[n], actions[n], reward)
+
 
   def add(self, context, action, reward):
     """Adds a new triplet (context, action, reward) to the dataset.

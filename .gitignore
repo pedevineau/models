@@ -94,4 +94,7 @@ ENV/
 # For mac
 .DS_Store
 
+**/deep_contextual_bandits/results*
+**/deep_contextual_bandits/graph*
+
 samples/outreach/blogs/segmentation_blogpost/carvana-image-masking-challenge/

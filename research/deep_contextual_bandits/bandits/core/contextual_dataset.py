@@ -51,7 +51,7 @@ class ContextualDataset(object):
     self.intercept = intercept
 
     if bootstrap is not None:
-      contexts, actions, rewards = generate_artificial_data()
+      contexts, actions, rewards = generate_artificial_data(50)
       for n, reward in enumerate(rewards):
         self.add(contexts[n], actions[n], reward)
 

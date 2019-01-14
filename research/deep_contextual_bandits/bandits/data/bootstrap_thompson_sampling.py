@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def generate_artificial_data(n_samples, n_features=112):
+def generate_artificial_data(n_samples, n_actions=2, n_features=112):
 	contexts = np.random.randint(0, 2, (n_samples, n_features))
-	actions = np.random.randint(0, 2, n_samples)
+	actions = np.random.randint(0, n_actions, n_samples)
 	rewards = np.random.randint(0, 10, n_samples)
 	return np.asarray(contexts, dtype=float), actions, rewards
 

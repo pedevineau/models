@@ -1,6 +1,4 @@
 import numpy as np
-import pandas as pd
-import tensorflow as tf
 from sklearn.preprocessing import OneHotEncoder
 
 
@@ -56,7 +54,7 @@ class Environment:
 class Mushrooms(Environment):
 	def __init__(self, r_idle=0., r_guy_is_fine=5., r_guy_is_poisoned=-35., pr_poisoned=0.5):
 		# default rewards values taken from the Deep Bandits article
-		Environment.__init__(self, path="/home/pierre/Documents/Info/DeepRL/data/agaricus-lepiota.data", nb_actions=2)
+		Environment.__init__(self, path="datasets/agaricus-lepiota.data", nb_actions=2)
 		self.r_idle = r_idle
 		self.r_guy_is_fine = r_guy_is_fine
 		self.r_guy_is_poisoned = r_guy_is_poisoned
@@ -89,7 +87,7 @@ class Mushrooms(Environment):
 class Covertype(Environment):
 	def __init__(self):
 		# default rewards values taken from the Deep Bandits article
-		Environment.__init__(self, path="/home/pierre/Documents/Info/DeepRL/data/covtype.data", nb_actions=7)
+		Environment.__init__(self, path="datasets/covtype.data", nb_actions=7)
 
 		labels, contexts = get_labels_contexts_covertype(self.path)
 		nb_features = contexts.shape[-1]

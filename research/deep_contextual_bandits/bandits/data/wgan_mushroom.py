@@ -111,7 +111,7 @@ class WGANMushroom:
 		# Load the dataset
 		# (X_train, _), (_, _) = mnist.load_data()
 		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_mushroom
-		# _, X_train = get_labels_contexts_mushroom(path="/home/pierre/Documents/Info/DeepRL/data/agaricus-lepiota.data")
+		# _, X_train = get_labels_contexts_mushroom(path="datasets/agaricus-lepiota.datasets")
 		X_train = np.ones((1000, self.n_features))
 		X_train[:, 0:60] = 0
 		print(X_train)

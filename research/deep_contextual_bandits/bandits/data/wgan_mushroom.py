@@ -110,9 +110,11 @@ class WGANMushroom:
 
 		# Load the dataset
 		# (X_train, _), (_, _) = mnist.load_data()
-		from parse_mushrooms import encode_mushrooms
-		X_train = encode_mushrooms()[:, 2:]
-
+		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_mushroom
+		# _, X_train = get_labels_contexts_mushroom(path="/home/pierre/Documents/Info/DeepRL/data/agaricus-lepiota.data")
+		X_train = np.ones((1000, self.n_features))
+		X_train[:, 0:60] = 0
+		print(X_train)
 		# Rescale -1 to 1
 		# X_train = (X_train.astype(np.float32) - 127.5) / 127.5
 		# X_train = np.expand_dims(X_train, axis=3)
@@ -168,22 +170,22 @@ class WGANMushroom:
 		r, c = 5, 5
 		noise = np.random.normal(0, 1, (r * c, self.n_noise))
 		gen_imgs = self.generator.predict(noise)
+		print(gen_imgs)
 
 		# Rescale images 0 - 1
-		gen_imgs = 0.5 * gen_imgs + 1
+		# gen_imgs = 0.5 * gen_imgs + 1
 
-		fig, axs = plt.subplots(r, c)
-		cnt = 0
-		for i in range(r):
-			for j in range(c):
-				axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
-				axs[i, j].axis('off')
-				cnt += 1
-		# fig.savefig("images/mnist_%d.png" % epoch)
-		plt.close()
+		# fig, axs = plt.subplots(r, c)
+		# cnt = 0
+		# for i in range(r):
+		# 	for j in range(c):
+		# 		axs[i, j].imshow(gen_imgs[cnt, :, :, 0], cmap='gray')
+		# 		axs[i, j].axis('off')
+		# 		cnt += 1
+		# # fig.savefig("images/mnist_%d.png" % epoch)
+		# plt.close()
 
 
 if __name__ == '__main__':
 	wgan = WGANMushroom()
-
-wgan.train(epochs=4000, batch_size=32, sample_interval=50)
+	wgan.train(epochs=4000, batch_size=32, sample_interval=50)

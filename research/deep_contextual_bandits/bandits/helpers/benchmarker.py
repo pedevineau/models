@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from bandits.core.contextual_bandit import run_contextual_bandit
 
-import pickle, time, sys, os
+import pickle, time, sys, os, json
 
 class Benchmarker(object):
     """
@@ -17,6 +17,9 @@ class Benchmarker(object):
         self.num_actions = num_actions
         self.context_dim = context_dim
         self.nb_contexts = nb_contexts
+        algos = [algo_proto() for algo_proto in self.algo_protos]
+        self.algo_names = [algo.name for algo in algos]
+        self.hparams = [algo.hparams.to_json() for algo in algos]
 
     def run_experiments(self, iterations = 10):
         cum_rew = np.zeros((self.nb_contexts, len(self.algo_protos), iterations))
@@ -57,30 +60,35 @@ class Benchmarker(object):
             'nb_contexts': self.nb_contexts,
             'cum_rew': self.cum_rew,
             'cum_reg': self.cum_reg,
-            'algo_details': str([(algo.name, algo.hparams.to_json) for algo in algos])
+            'algo_details': json.dumps([(name, hparams) for name, hparams in zip(self.algo_names, self.hparams)])
         }
-        #, 'dataset_proto': self.dataset_proto, 'algo_protos': self.algo_protos
 
         with open(path + prefix + '_' + self.test_name + '.pickle', 'wb') as handle:
             pickle.dump(dic, handle)
 
-    # def load(path):
-    #     with open(path, 'rb') as handle:
-    #         dic = pickle.read(dic, handle)
-    #     benchmarker = Benchmarker(dic['algo_protos'], dic['dataset_proto'], dic['num_actions'], dic['context_dim'], dic['nb_contexts'], dic['test_name'])
-    #     benchmarker.results = dic['results']
-    #     return benchmarker
+    def save_final_res_to_tex(self, save_path):
+        res = self.cum_reg
+        means, stds =  np.mean(res, axis=2), np.std(res, axis=2)
+        # print
+        m = np.max(means)
+        cell_text = ['%.2f +/- %.2f'%(100*mean/m, 100*std/m) for mean, std in zip(means[-1,:], stds[-1,:])]
+        order = np.argsort(means[-1,:])
+
+        cellText=np.array(cell_text)[order][:,np.newaxis],
+        colLabels=['Final Regret'],
+        rowLabels=np.array(self.algo_names)[order],
+        m2 = np.max(means[-1,:]-means[-100,:])
+        easy_names = [name.replace('_bs',' batchsize=').replace('_ls',' layers=').replace('_RMS','  RMSprop').replace('_SGD',' SGD')
+            for name in self.algo_names]
+        d = {'Algorithm': np.array(easy_names)[order], 'Final regret': np.array(cell_text)[order], 'Last100regrets':np.round((means[-1,:] - means[-100,:])*100/m2)[order]}
+        pd.DataFrame(data=d).to_csv(save_path+self.test_name+'.csv', sep='&', line_terminator=' \\\\ \n', header=True, index=False)
 
     def display_results(self, save_path=None):
-        plt.figure()
-        algos = [algo_proto() for algo_proto in self.algo_protos]
-        algo_names = [algo.name for algo in algos]
-
-
+        plt.figure(figsize=(10,20))
         t = np.arange(self.cum_reg.shape[0])
         res = self.cum_reg
         means, stds =  np.mean(res, axis=2), np.std(res, axis=2)
-        for i, algo_name in enumerate(algo_names):
+        for i, algo_name in enumerate(self.algo_names):
             mean, std = means[:,i], stds[:,i]
             plt.plot(t, mean, label=algo_name)
             plt.fill_between(t, mean-std, mean+std, alpha=0.3)

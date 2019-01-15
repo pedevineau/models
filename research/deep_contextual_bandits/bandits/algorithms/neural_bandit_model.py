@@ -180,6 +180,8 @@ class NeuralBanditModel(BayesianNN):
 
   def select_optimizer(self):
     """Selects optimizer. To be extended (SGLD, KFAC, etc)."""
+    if self.opt_name=="SGD":
+        return tf.train.GradientDescentOptimizer(self.lr)
     return tf.train.RMSPropOptimizer(self.lr)
 
   def create_summaries(self):

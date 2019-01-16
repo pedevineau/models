@@ -21,8 +21,8 @@ def get_labels_contexts_covertype(path):
 		buffer = []
 		for line in f:
 			buffer.append(line.split(','))
-		buffer = np.array(buffer)
-		encoded_data = one_hot_encoding(buffer[:, :-1])
+		buffer = np.array(buffer, dtype=float)
+		encoded_data = buffer[:, :-1]
 	return buffer[:, -1], encoded_data
 
 
@@ -97,8 +97,10 @@ class Covertype(Environment):
 		for k in range(self.nb_actions):
 			self.table[:, nb_features+k] = self.get_stochastic_rewards(k*np.ones_like(labels), labels)
 
-		self.opts = np.concatenate((np.max(self.table[:, nb_features:nb_features+self.nb_actions], axis=0),
-									np.expand_dims(labels, axis=1)), axis=1)
+		self.opts = np.concatenate(
+			(np.expand_dims(np.max(self.table[:, nb_features:nb_features+self.nb_actions], axis=1), axis=1),
+			np.expand_dims(labels, axis=1)),
+		axis=1)
 
 	def get_stochastic_rewards(self, actions, labels):
 		return np.array(actions == labels, dtype=float)
@@ -119,4 +121,4 @@ if __name__ == '__main__':
 	rewards=covertype.opts[:30,0]
 	actions=covertype.opts[:30,1]
 	# print(rewards)
-	# print(covertype.get_stochastic_regret(actions, np.zeros_like(actions)))
+	print(covertype.get_stochastic_regret(actions, np.zeros_like(actions)))

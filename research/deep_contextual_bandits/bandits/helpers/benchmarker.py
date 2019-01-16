@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from bandits.core.contextual_bandit import run_contextual_bandit
 
 import pickle, time, sys, os, json
-
+import pandas as pd
 class Benchmarker(object):
     """
     Takes functions that create algos and dataset so as to rerun experiments several times and plot results.

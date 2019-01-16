@@ -45,13 +45,13 @@ from bandits.algorithms.lin_ucb import LinUCB
 from bandits.algorithms.lin_epsilon import LinEpsilon
 from bandits.algorithms.neural_lin_ucb import NeuralLinUCB
 
-# from bandits.algorithms.bootstrapped_bnn_sampling import BootstrappedBNNSampling
+from bandits.algorithms.bootstrapped_bnn_sampling import BootstrappedBNNSampling
 from bandits.core.contextual_bandit import run_contextual_bandit
 # from bandits.data.data_sampler import sample_mushroom_data
 from bandits.algorithms.fixed_policy_sampling import FixedPolicySampling
 from bandits.algorithms.linear_full_posterior_sampling import LinearFullPosteriorSampling
 from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampling
-# from bandits.algorithms.parameter_noise_sampling import ParameterNoiseSampling
+from bandits.algorithms.parameter_noise_sampling import ParameterNoiseSampling
 from bandits.algorithms.posterior_bnn_sampling import PosteriorBNNSampling
 from bandits.data.synthetic_data_sampler import sample_linear_data
 from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
@@ -60,8 +60,8 @@ from bandits.data.environments import  *
 from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
 
 from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampling
-# from bandits.data.synthetic_data_sampler import sample_sparse_linear_data
-# from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
+from bandits.data.synthetic_data_sampler import sample_sparse_linear_data
+from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
 from bandits.algorithms.uniform_sampling import UniformSampling
 
 base_route = os.getcwd()
@@ -123,7 +123,7 @@ def dataset_proto(name=name):
 
     return dataset, opt_linear
 
-print(dataset_proto()[0].shape)
+# print(dataset_proto()[0].shape)
 
 # Params for algo templates
 hparams = tf.contrib.training.HParams(num_actions=num_actions)
@@ -136,4 +136,5 @@ benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, 
 
 benchmarker.run_experiments(5)
 benchmarker.save_results('./results/')
+benchmarker.save_final_res_to_tex('./results/')
 benchmarker.display_results(save_path='./results/')

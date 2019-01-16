@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
-
+import os
 
 def get_labels_contexts_mushroom(path):
 	'''
@@ -52,14 +52,24 @@ class Environment:
 
 
 class Mushrooms(Environment):
-	def __init__(self, r_idle=0., r_guy_is_fine=5., r_guy_is_poisoned=-35., pr_poisoned=0.5):
+	def __init__(self, num_contexts=8000, r_idle=0., r_guy_is_fine=5., r_guy_is_poisoned=-35., pr_poisoned=0.5):
+		# action 1 manger action 0 rien
+		# label 1 edible label 0 poionous
 		# default rewards values taken from the Deep Bandits article
-		Environment.__init__(self, path="datasets/agaricus-lepiota.data", nb_actions=2)
+		self.dirname = os.path.dirname(__file__)
+		Environment.__init__(self, path=os.path.join(self.dirname, "datasets/agaricus-lepiota.data"), nb_actions=2)
 		self.r_idle = r_idle
 		self.r_guy_is_fine = r_guy_is_fine
 		self.r_guy_is_poisoned = r_guy_is_poisoned
 		self.pr_poisoned = pr_poisoned
 		labels, contexts = get_labels_contexts_mushroom(self.path)
+
+		order = np.arange(len(labels))
+		np.random.shuffle(order)
+		labels = labels[order[:min(num_contexts, len(labels) + 1)]]
+		contexts = contexts[order[:min(num_contexts, len(labels) + 1)]]
+
+		# print(labels, contexts)
 		nb_features = contexts.shape[-1]
 		n_rows = self.nb_actions + nb_features
 		self.table = np.empty((len(labels), n_rows))
@@ -78,18 +88,24 @@ class Mushrooms(Environment):
 
 	def get_stochastic_rewards(self, actions, labels):
 		poisoned = (np.random.random(len(labels)) < self.pr_poisoned) *(1-labels)
-		return actions*(self.r_guy_is_fine+poisoned*(self.r_guy_is_poisoned-self.r_guy_is_fine))
+		return actions*(self.r_guy_is_fine+poisoned*(self.r_guy_is_poisoned - self.r_guy_is_fine))
 
 	def get_stochastic_regret(self, actions, labels):
 		return (self.opts[:, 0] - self.get_stochastic_rewards(actions, labels)).sum()
 
 
 class Covertype(Environment):
-	def __init__(self):
+	def __init__(self, num_contexts=2000):
 		# default rewards values taken from the Deep Bandits article
-		Environment.__init__(self, path="datasets/covtype.data", nb_actions=7)
+		self.dirname = os.path.dirname(__file__)
+		Environment.__init__(self, path=os.path.join(self.dirname, "datasets/covtype.data"), nb_actions=7)
 
 		labels, contexts = get_labels_contexts_covertype(self.path)
+		order = np.arange(len(labels))
+		np.random.shuffle(order)
+		labels = labels[order[:min(num_contexts, len(labels) + 1)]]
+		contexts = contexts[order[:min(num_contexts, len(labels) + 1)]]
+
 		nb_features = contexts.shape[-1]
 		n_rows = self.nb_actions + nb_features
 		self.table = np.empty((len(labels), n_rows))

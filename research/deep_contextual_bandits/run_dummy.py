@@ -54,6 +54,9 @@ from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampl
 # from bandits.algorithms.parameter_noise_sampling import ParameterNoiseSampling
 from bandits.algorithms.posterior_bnn_sampling import PosteriorBNNSampling
 from bandits.data.synthetic_data_sampler import sample_linear_data
+from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
+from bandits.data.environments import  *
+
 from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
 
 from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampling
@@ -72,16 +75,51 @@ FLAGS(sys.argv)
 
 ############# STARTS HERE ##############"""
 # Create dataset template
-num_actions = 8
-context_dim = 10
-num_contexts = 1500
+
+# Linear Dataet params
+# num_actions = 8
+# context_dim = 10
+# num_contexts = 1500
 # noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
-noise_stds = [1 for i in range(num_actions)]
+# noise_stds = [1 for i in range(num_actions)]
+
+#wheel params
+# num_actions = 5
+# context_dim = 2
+# num_contexts = 1500
+# delta = 0.95
+# mean_v = [1.0, 1.0, 1.0, 1.0, 1.2]
+# std_v = [0.05, 0.05, 0.05, 0.05, 0.05]
+# mu_large = 50
+# std_large = 0.01
+
+
+#Mushrooms params
+# num_actions = 2
+# context_dim = 117
+# num_contexts = 3000
+
+#Covertype params
+num_actions = 7
+context_dim = 54
+num_contexts = 3000
 
 def dataset_proto():
-    dataset, _, opt_linear = sample_linear_data(num_contexts, context_dim,
-                                                num_actions, sigma=noise_stds)
+    # dataset, _, opt_linear = sample_linear_data(num_contexts, context_dim,
+    #                                             num_actions, sigma=noise_stds)
+    # dataset, opt_linear = sample_wheel_bandit_data(num_contexts, delta,
+    #                                               mean_v, std_v,
+    #                                               mu_large, std_large)
+    # mush = Mushrooms(num_contexts=num_contexts)
+    mush = Covertype(num_contexts=num_contexts)
+    # actions = np.ones(len(mush.opts))
+    # /print(mush.get_stochastic_regret())
+    dataset = mush.table
+    opt_rewards, opt_actions = mush.opts[:,0], mush.opts[:,1]
+    opt_linear = (opt_rewards, opt_actions)
     return dataset, opt_linear
+
+print(dataset_proto()[0].shape)
 
 # Params for algo templates
 hparams = tf.contrib.training.HParams(num_actions=num_actions)

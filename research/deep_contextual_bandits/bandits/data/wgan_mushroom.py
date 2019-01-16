@@ -21,7 +21,7 @@ import numpy as np
 
 class WGANMushroom:
 	def __init__(self):
-		self.n_features = 112
+		self.n_features = 117
 		self.n_noise = 100
 
 		# Following parameter and optimizer set as recommended in paper
@@ -111,10 +111,11 @@ class WGANMushroom:
 		# Load the dataset
 		# (X_train, _), (_, _) = mnist.load_data()
 		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_mushroom
-		# _, X_train = get_labels_contexts_mushroom(path="datasets/agaricus-lepiota.datasets")
+		# _, X_train = get_labels_contexts_mushroom(path="/home/pierre/Documents/Info/DeepRL/models/research/deep_contextual_bandits/bandits/data/"
+		# 											   "datasets/agaricus-lepiota.data")
 		X_train = np.ones((1000, self.n_features))
 		X_train[:, 0:60] = 0
-		print(X_train)
+		# print(X_train)
 		# Rescale -1 to 1
 		# X_train = (X_train.astype(np.float32) - 127.5) / 127.5
 		# X_train = np.expand_dims(X_train, axis=3)
@@ -163,14 +164,16 @@ class WGANMushroom:
 			print("%d [D loss: %f] [G loss: %f]" % (epoch, 1 - d_loss[0], 1 - g_loss[0]))
 
 			# If at save interval => save generated image samples
-			# if epoch % sample_interval == 0:
-			# 	self.sample_images(epoch)
+			if epoch % sample_interval == 0:
+				self.sample_images(epoch)
 
 	def sample_images(self, epoch):
-		r, c = 5, 5
-		noise = np.random.normal(0, 1, (r * c, self.n_noise))
+		# r, c = 5, 5
+		noise = np.random.normal(0, 1, (1,self.n_noise))
 		gen_imgs = self.generator.predict(noise)
+		# print(gen_imgs)
 		print(gen_imgs)
+		print(self.critic.predict(gen_imgs))
 
 		# Rescale images 0 - 1
 		# gen_imgs = 0.5 * gen_imgs + 1

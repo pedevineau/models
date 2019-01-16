@@ -27,7 +27,7 @@ def get_labels_contexts_covertype(path):
 
 
 def one_hot_encoding(buffer):
-	enc = OneHotEncoder(sparse=False, )
+	enc = OneHotEncoder(sparse=False, categories="auto")
 	encoded_data = enc.fit_transform(buffer)
 	return encoded_data
 
@@ -59,7 +59,7 @@ class Mushrooms(Environment):
 		self.r_guy_is_fine = r_guy_is_fine
 		self.r_guy_is_poisoned = r_guy_is_poisoned
 		self.pr_poisoned = pr_poisoned
-		labels, contexts = get_labels_contexts_covertype(self.path)
+		labels, contexts = get_labels_contexts_mushroom(self.path)
 		nb_features = contexts.shape[-1]
 		n_rows = self.nb_actions + nb_features
 		self.table = np.empty((len(labels), n_rows))
@@ -67,7 +67,7 @@ class Mushrooms(Environment):
 		self.table[:, nb_features] = self.get_stochastic_rewards(np.zeros_like(labels), labels)
 		self.table[:, nb_features+1] = self.get_stochastic_rewards(np.ones_like(labels), labels)
 
-		self.opts = np.concatenate((np.expand_dims(self.get_stochastic_rewards(labels, labels),axis=1),
+		self.opts = np.concatenate((np.expand_dims(np.maximum(self.table[:, nb_features], self.table[:, nb_features+1]),axis=1),
 									np.expand_dims(labels, axis=1)), axis=1)
 	#
 	# def pick_mushrooms(self, n_samples):
@@ -78,7 +78,7 @@ class Mushrooms(Environment):
 
 	def get_stochastic_rewards(self, actions, labels):
 		poisoned = (np.random.random(len(labels)) < self.pr_poisoned) *(1-labels)
-		return actions*(self.r_guy_is_fine-poisoned*(self.r_guy_is_fine+self.r_guy_is_poisoned))
+		return actions*(self.r_guy_is_fine+poisoned*(self.r_guy_is_poisoned-self.r_guy_is_fine))
 
 	def get_stochastic_regret(self, actions, labels):
 		return (self.opts[:, 0] - self.get_stochastic_rewards(actions, labels)).sum()
@@ -94,10 +94,10 @@ class Covertype(Environment):
 		n_rows = self.nb_actions + nb_features
 		self.table = np.empty((len(labels), n_rows))
 		self.table[:, :nb_features] = contexts
-		self.table[:, nb_features] = self.get_stochastic_rewards(np.zeros_like(labels), labels)
-		self.table[:, nb_features+1] = self.get_stochastic_rewards(np.ones_like(labels), labels)
+		for k in range(self.nb_actions):
+			self.table[:, nb_features+k] = self.get_stochastic_rewards(k*np.ones_like(labels), labels)
 
-		self.opts = np.concatenate((np.expand_dims(self.get_stochastic_rewards(self, actions, labels), axis=1),
+		self.opts = np.concatenate((np.max(self.table[:, nb_features:nb_features+self.nb_actions], axis=0),
 									np.expand_dims(labels, axis=1)), axis=1)
 
 	def get_stochastic_rewards(self, actions, labels):
@@ -108,9 +108,15 @@ class Covertype(Environment):
 
 
 if __name__ == '__main__':
+
 	mush = Mushrooms()
-	actions = np.ones(len(mush.opts))
-	labels = np.ones()
-	print(mush.get_stochastic_regret())
+	rewards=mush.opts[:,0]
+	actions=mush.opts[:, 1]
+	# print(rewards)
+	print(mush.get_stochastic_regret(actions, np.zeros_like(actions)))
 
-
+	covertype = Covertype()
+	rewards=covertype.opts[:30,0]
+	actions=covertype.opts[:30,1]
+	# print(rewards)
+	# print(covertype.get_stochastic_regret(actions, np.zeros_like(actions)))

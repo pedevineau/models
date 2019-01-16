@@ -75,48 +75,52 @@ FLAGS(sys.argv)
 
 ############# STARTS HERE ##############"""
 # Create dataset template
+name = "linear"
+if name=="linear":
+    num_actions = 8
+    context_dim = 10
+    num_contexts = 1500
+    noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
+    noise_stds = [1 for i in range(num_actions)]
+elif name=="mushroom":
+    num_actions = 2
+    context_dim = 117
+    num_contexts = 3000
+elif name=="wheel":
+    num_actions = 5
+    context_dim = 2
+    num_contexts = 1500
+    delta = 0.95
+    mean_v = [1.0, 1.0, 1.0, 1.0, 1.2]
+    std_v = [0.05, 0.05, 0.05, 0.05, 0.05]
+    mu_large = 50
+    std_large = 0.01
+elif name=="covertype":
+    num_actions = 7
+    context_dim = 54
+    num_contexts = 3000
+else:
+    raise Exception('name not recognized')
 
-# Linear Dataet params
-# num_actions = 8
-# context_dim = 10
-# num_contexts = 1500
-# noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
-# noise_stds = [1 for i in range(num_actions)]
+def dataset_proto(name=name):
+    if name=="linear":
+        dataset, _, opt_linear = sample_linear_data(num_contexts, context_dim,
+                                                    num_actions, sigma=noise_stds)
+    elif name=="wheel":
+        dataset, opt_linear = sample_wheel_bandit_data(num_contexts, delta,
+                                                      mean_v, std_v,
+                                                      mu_large, std_large)
+    elif name=="mushroom":
+        mush = Mushrooms(num_contexts=num_contexts)
+        dataset = mush.table
+        opt_rewards, opt_actions = mush.opts[:,0], mush.opts[:,1]
+        opt_linear = (opt_rewards, opt_actions)
+    elif name=="covertype":
+        cov = Covertype(num_contexts=num_contexts)
+        dataset = cov.table
+        opt_rewards, opt_actions = cov.opts[:,0], cov.opts[:,1]
+        opt_linear = (opt_rewards, opt_actions)
 
-#wheel params
-# num_actions = 5
-# context_dim = 2
-# num_contexts = 1500
-# delta = 0.95
-# mean_v = [1.0, 1.0, 1.0, 1.0, 1.2]
-# std_v = [0.05, 0.05, 0.05, 0.05, 0.05]
-# mu_large = 50
-# std_large = 0.01
-
-
-#Mushrooms params
-# num_actions = 2
-# context_dim = 117
-# num_contexts = 3000
-
-#Covertype params
-num_actions = 7
-context_dim = 54
-num_contexts = 3000
-
-def dataset_proto():
-    # dataset, _, opt_linear = sample_linear_data(num_contexts, context_dim,
-    #                                             num_actions, sigma=noise_stds)
-    # dataset, opt_linear = sample_wheel_bandit_data(num_contexts, delta,
-    #                                               mean_v, std_v,
-    #                                               mu_large, std_large)
-    # mush = Mushrooms(num_contexts=num_contexts)
-    mush = Covertype(num_contexts=num_contexts)
-    # actions = np.ones(len(mush.opts))
-    # /print(mush.get_stochastic_regret())
-    dataset = mush.table
-    opt_rewards, opt_actions = mush.opts[:,0], mush.opts[:,1]
-    opt_linear = (opt_rewards, opt_actions)
     return dataset, opt_linear
 
 print(dataset_proto()[0].shape)

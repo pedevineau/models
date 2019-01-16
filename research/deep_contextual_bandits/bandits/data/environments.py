@@ -23,7 +23,7 @@ def get_labels_contexts_covertype(path):
 			buffer.append(line.split(','))
 		buffer = np.array(buffer, dtype=float)
 		encoded_data = buffer[:, :-1]
-	return buffer[:, -1], encoded_data
+	return buffer[:, -1]-1, encoded_data
 
 
 def one_hot_encoding(buffer):
@@ -32,7 +32,7 @@ def one_hot_encoding(buffer):
 	return encoded_data
 
 
-def get_labels_contexts_covertype(path):
+def get_decoded_covertype(path):
 	with open(path) as f:
 		buffer = []
 		for line in f:

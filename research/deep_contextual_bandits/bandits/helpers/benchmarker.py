@@ -19,7 +19,7 @@ class Benchmarker(object):
         self.nb_contexts = nb_contexts
         algos = [algo_proto() for algo_proto in self.algo_protos]
         self.algo_names = [algo.name for algo in algos]
-        self.hparams = [algo.hparams.to_json() for algo in algos]
+        # self.hparams = [algo.hparams.to_json() for algo in algos]
 
     def run_experiments(self, iterations = 10):
         cum_rew = np.zeros((self.nb_contexts, len(self.algo_protos), iterations))
@@ -52,15 +52,15 @@ class Benchmarker(object):
         self.cum_reg = cum_reg
 
     def save_results(self, path, prefix = ''):
-        algos = [algo_proto() for algo_proto in self.algo_protos]
+        # algos = [algo_proto() for algo_proto in self.algo_protos]
         dic = {
             'test_name': self.test_name,
             'num_actions': self.num_actions,
             'context_dim': self.context_dim,
             'nb_contexts': self.nb_contexts,
             'cum_rew': self.cum_rew,
-            'cum_reg': self.cum_reg,
-            'algo_details': json.dumps([(name, hparams) for name, hparams in zip(self.algo_names, self.hparams)])
+            'cum_reg': self.cum_reg
+            # 'algo_details': json.dumps([(name, hparams) for name, hparams in zip(self.algo_names, self.hparams)])
         }
 
         with open(path + prefix + '_' + self.test_name + '.pickle', 'wb') as handle:

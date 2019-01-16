@@ -51,6 +51,8 @@ def run_contextual_bandit(context_dim, num_actions, dataset, algos):
 
   # Run the contextual bandit process
   for i in range(num_contexts):
+    if i%10==0:
+        print(i,'/',num_contexts)
     context = cmab.context(i)
     actions = [a.action(context) for a in algos]
     rewards = [cmab.reward(i, action) for action in actions]

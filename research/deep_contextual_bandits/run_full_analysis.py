@@ -76,6 +76,8 @@ FLAGS(sys.argv)
 
 ############# STARTS HERE ##############"""
 name = "linear"
+test_name = "full_analysis_" + name
+
 if name=="linear":
     num_actions = 8
     context_dim = 10
@@ -177,16 +179,100 @@ hparams_rms = tf.contrib.training.HParams(num_actions=num_actions,
                                         lr_decay_rate=0.5,
                                         training_freq=50,
                                         training_epochs=50,
-                                        bootstrap=artificial_data_generator)
+                                        bootstrap=None)
 
-
-
-hparams_rms2 = tf.contrib.training.HParams(num_actions=num_actions,
+hparams_rms_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
                                         context_dim=context_dim,
                                         init_scale=0.3,
                                         activation=tf.nn.relu,
                                         layer_sizes=[50],
-                                        batch_size=64,
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        initial_pulls=2,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        bootstrap=artificial_data_generator)
+
+hparams_rmsb = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        initial_pulls=2,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        bootstrap=None,
+                                        q=3,p=0.95)
+
+hparams_rmsb_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        initial_pulls=2,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        q=3,p=0.95,
+                                        bootstrap=artificial_data_generator)
+
+hparams_dropout = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        use_dropout=True,
+                                        keep_prob=0.95,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        initial_pulls=2,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        bootstrap=None)
+
+hparams_dropout_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        use_dropout=True,
+                                        keep_prob=0.95,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
                                         activate_decay=True,
                                         initial_lr=0.1,
                                         max_grad_norm=5.0,
@@ -207,6 +293,28 @@ hparams_linucb = tf.contrib.training.HParams(num_actions=num_actions,
                                         lam=0.1)
 
 hparams_neural_linucb = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        initial_pulls=2,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        training_freq_network=50,
+                                        bootstrap=None,
+                                        alpha=1,
+                                        lam=0.1)
+hparams_neural_linucb_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
                                         context_dim=context_dim,
                                         init_scale=0.3,
                                         activation=tf.nn.relu,
@@ -246,30 +354,125 @@ hparams_neural_linthomson = tf.contrib.training.HParams(num_actions=num_actions,
                                         training_freq=50,
                                         training_epochs=50,
                                         training_freq_network=50,
+                                        bootstrap=None,
+                                        a0=6,
+                                        b0=6,
+                                        lambda_prior=0.25,
+                                        initial_pulls=2)
+
+hparams_neural_linthomson_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
+                                        context_dim=context_dim,
+                                        init_scale=0.3,
+                                        activation=tf.nn.relu,
+                                        layer_sizes=[50],
+                                        batch_size=512,
+                                        activate_decay=True,
+                                        initial_lr=0.1,
+                                        max_grad_norm=5.0,
+                                        show_training=False,
+                                        freq_summary=1000,
+                                        buffer_s=-1,
+                                        optimizer='RMS',
+                                        reset_lr=True,
+                                        lr_decay_rate=0.5,
+                                        training_freq=50,
+                                        training_epochs=50,
+                                        training_freq_network=50,
                                         bootstrap=artificial_data_generator,
                                         a0=6,
                                         b0=6,
                                         lambda_prior=0.25,
                                         initial_pulls=2)
+
+hparams_pnoise = tf.contrib.training.HParams(num_actions=num_actions,
+                                       context_dim=context_dim,
+                                       init_scale=0.3,
+                                       activation=tf.nn.relu,
+                                       layer_sizes=[50],
+                                       batch_size=512,
+                                       activate_decay=True,
+                                       initial_lr=0.1,
+                                       max_grad_norm=5.0,
+                                       show_training=False,
+                                       freq_summary=1000,
+                                       buffer_s=-1,
+                                       initial_pulls=2,
+                                       optimizer='RMS',
+                                       reset_lr=True,
+                                       lr_decay_rate=0.5,
+                                       training_freq=50,
+                                       training_epochs=100,
+                                       noise_std=0.05,
+                                       eps=0.1,
+                                       d_samples=300
+                                      )
+
+hparams_pnoise_bootstrapped = tf.contrib.training.HParams(num_actions=num_actions,
+                                       context_dim=context_dim,
+                                       init_scale=0.3,
+                                       activation=tf.nn.relu,
+                                       layer_sizes=[50],
+                                       batch_size=512,
+                                       activate_decay=True,
+                                       initial_lr=0.1,
+                                       max_grad_norm=5.0,
+                                       show_training=False,
+                                       freq_summary=1000,
+                                       buffer_s=-1,
+                                       initial_pulls=2,
+                                       optimizer='RMS',
+                                       reset_lr=True,
+                                       lr_decay_rate=0.5,
+                                       training_freq=50,
+                                       training_epochs=100,
+                                       noise_std=0.05,
+                                       eps=0.1,
+                                       d_samples=300,
+                                       bootstrap=artificial_data_generator
+                                      )
+
 hparams_lineps = tf.contrib.training.HParams(num_actions=num_actions,
                                         context_dim=context_dim,
                                         lam=0.1,
                                         eps=0.05)
 
-neural_greedy_proto = lambda : PosteriorBNNSampling('NeuralGreedy_bs_512', hparams_rms, 'RMSProp')
 random_proto = lambda : UniformSampling('Uniform Sampling', hparams)
+neural_greedy_proto = lambda : PosteriorBNNSampling('NeuralGreedy', hparams_rms, 'RMSProp')
+neural_greedy_proto_bootstrapped = lambda : PosteriorBNNSampling('NeuralGreedy_artificial_data', hparams_rms_bootstrapped, 'RMSProp')
+
+bootstrap_proto = lambda : BootstrappedBNNSampling('BootRMS', hparams_rmsb)
+bootstrap_proto_bootstrapped = lambda : BootstrappedBNNSampling('BootRMS_artificial_data', hparams_rmsb_bootstrapped)
+
+noise_proto = lambda : ParameterNoiseSampling('ParamNoise', hparams_pnoise)
+noise_proto_bootstrapped = lambda : ParameterNoiseSampling('ParamNoise_artificial_data', hparams_pnoise_bootstrapped)
+
+dropout_proto = lambda : PosteriorBNNSampling('Dropout', hparams_dropout, 'RMSProp')
+dropout_proto_bootstrapped = lambda : PosteriorBNNSampling('Dropout_artificial_data', hparams_dropout_bootstrapped, 'RMSProp')
+
 linThompson_proto = lambda : LinearFullPosteriorSampling('linThompson', hparams_linear)
 linUCB_proto = lambda : LinUCB('linUCB', hparams_linucb)
 linEps_proto = lambda : LinEpsilon('LinEpsilon', hparams_lineps)
+
 neuralLinUCB_proto = lambda : NeuralLinUCB('NeuralLinUCB', hparams_neural_linucb, 'RMSProp')
 neuralLinThomson_proto = lambda : NeuralLinearPosteriorSampling('NeuralLinThomson', hparams_neural_linthomson, 'RMSProp')
+neuralLinUCB_proto_bootstrapped = lambda : NeuralLinUCB('NeuralLinUCB_artificial_data', hparams_neural_linucb_bootstrapped, 'RMSProp')
+neuralLinThomson_proto_bootstrapped = lambda : NeuralLinearPosteriorSampling('NeuralLinThomson_artificial_data', hparams_neural_linthomson_bootstrapped, 'RMSProp')
 
-algo_protos = [linUCB_proto,neuralLinUCB_proto, neuralLinThomson_proto, linEps_proto, linThompson_proto, neural_greedy_proto, random_proto]
-
+algo_protos = [linUCB_proto,
+    neuralLinUCB_proto, neuralLinUCB_proto_bootstrapped,
+    dropout_proto, dropout_proto_bootstrapped,
+    bootstrap_proto, bootstrap_proto_bootstrapped,
+    noise_proto, noise_proto_bootstrapped,
+    neuralLinThomson_proto, neuralLinThomson_proto_bootstrapped,
+    linEps_proto,
+    linThompson_proto,
+    neural_greedy_proto, neural_greedy_proto_bootstrapped,
+    random_proto]
 
 # Run experiments several times save and plot results
-benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, nb_contexts=num_contexts, test_name='full_analysis_wheel')
+benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, nb_contexts=num_contexts, test_name=test_name)
 
-benchmarker.run_experiments(5)
+benchmarker.run_experiments(2)
 benchmarker.save_results('./results/')
+benchmarker.save_final_res_to_tex('./results/')
 benchmarker.display_results(save_path='./results/')

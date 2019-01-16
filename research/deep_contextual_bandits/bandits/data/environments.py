@@ -32,6 +32,17 @@ def one_hot_encoding(buffer):
 	return encoded_data
 
 
+def get_labels_contexts_covertype(path):
+	with open(path) as f:
+		buffer = []
+		for line in f:
+			buffer.append(line.split(','))
+		buffer = np.array(buffer, dtype=float)
+		encoded_data = buffer[:, :-1]
+	return buffer[:, -1], encoded_data
+
+
+
 class Environment:
 	def __init__(self, path, nb_actions):
 		"""Initialize the environment."""

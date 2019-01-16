@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Define a data buffer for contextual bandit algorithms."""
+"""Define a datasets buffer for contextual bandit algorithms."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -21,23 +21,23 @@ from __future__ import print_function
 
 import numpy as np
 
-from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
+from bandits.data.bootstrap_thompson_sampling import generate_uniform_artificial
 
 
 class ContextualDataset(object):
-  """The buffer is able to append new data, and sample random minibatches."""
+  """The buffer is able to append new datasets, and sample random minibatches."""
 
   def __init__(self, context_dim, num_actions, buffer_s=-1, intercept=False, bootstrap=None):
     """Creates a ContextualDataset object.
 
-    The data is stored in attributes: contexts and rewards.
+    The datasets is stored in attributes: contexts and rewards.
     The sequence of taken actions are stored in attribute actions.
 
     Args:
       context_dim: Dimension of the contexts.
       num_actions: Number of arms for the multi-armed bandit.
       buffer_s: Size of buffer for training. Only last buffer_s will be
-        returned as minibatch. If buffer_s = -1, all data will be used.
+        returned as minibatch. If buffer_s = -1, all datasets will be used.
       intercept: If True, it adds a constant (1.0) dimension to each context X,
         at the end.
     """
@@ -99,7 +99,7 @@ class ContextualDataset(object):
     """Returns a random minibatch of (contexts, rewards) with batch_size."""
     n, _ = self.contexts.shape
     if self.buffer_s == -1:
-      # use all the data
+      # use all the datasets
       ind = np.random.choice(range(n), batch_size)
     else:
       # use only buffer (last buffer_s observations)
@@ -123,7 +123,7 @@ class ContextualDataset(object):
     """Returns a random mini-batch with one-hot weights for actions."""
     n, _ = self.contexts.shape
     if self.buffer_s == -1:
-      # use all the data
+      # use all the datasets
       ind = np.random.choice(range(n), batch_size)
     else:
       # use only buffer (last buffer_s obs)

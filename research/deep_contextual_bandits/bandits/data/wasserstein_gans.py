@@ -20,9 +20,11 @@ import numpy as np
 
 
 class WGANCovertype:
-	def __init__(self):
-		self.n_features = 54
+	def __init__(self, n_features=54, file="datasets/covtype.data"):
+		self.n_features = n_features
 		self.n_noise = 100
+		self.file = file
+
 
 		# Following parameter and optimizer set as recommended in paper
 		self.n_critic = 5
@@ -67,7 +69,7 @@ class WGANCovertype:
 		model.add(Dropout(0.25))
 		model.add(Dense(64, activation="relu"))
 		model.add(Dropout(0.25))
-		model.add(Dense(self.n_features, activation="sigmoid"))
+		model.add(Dense(self.n_features, activation="relu"))
 
 		model.summary()
 
@@ -106,7 +108,32 @@ class WGANCovertype:
 		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_covertype
 		import os
 		self.dirname = os.path.dirname(__file__)
-		_, X_train = get_labels_contexts_covertype(path=os.path.join(self.dirname,"datasets/covtype.data"))
+		if self.file == "linear":
+			from bandits.data.synthetic_data_sampler import sample_linear_data
+			num_actions = 8
+			context_dim = 10
+			num_contexts = 1500
+			noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
+			noise_stds = [1 for i in range(num_actions)]
+			X_train = sample_linear_data(num_contexts, context_dim,
+							   num_actions, sigma=noise_stds)[0][:, :-8]
+
+		elif self.file == "wheel":
+			from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
+			num_actions = 5
+			context_dim = 2
+			num_contexts = 1500
+			delta = 0.95
+			mean_v = [1.0, 1.0, 1.0, 1.0, 1.2]
+			std_v = [0.05, 0.05, 0.05, 0.05, 0.05]
+			mu_large = 50
+			std_large = 0.01
+			X_train = sample_wheel_bandit_data(num_contexts, delta,
+											 mean_v, std_v,
+											 mu_large, std_large)[0][:, :-5]
+
+		else:
+			_, X_train = get_labels_contexts_covertype(path=os.path.join(self.dirname,self.file))
 
 
 		# Adversarial ground truths
@@ -150,11 +177,11 @@ class WGANCovertype:
 			g_loss = self.combined.train_on_batch(noise, valid)
 
 			# Plot the progress
-			print("%d [D loss: %f] [G loss: %f]" % (epoch, 1 - d_loss[0], 1 - g_loss[0]))
+			# print("%d [D loss: %f] [G loss: %f]" % (epoch, 1 - d_loss[0], 1 - g_loss[0]))
 
 			# If at save interval => save generated image samples
-			if epoch % sample_interval == 0:
-				self.show_predictions(epoch)
+			# if epoch % sample_interval == 0:
+			# 	self.show_predictions(epoch)
 
 	def show_predictions(self, epoch):
 		# r, c = 5, 5
@@ -162,13 +189,17 @@ class WGANCovertype:
 		gen = self.generator.predict(noise)
 		# print(self.critic.predict(gen))
 
+	def generate_contexts(self, n_samples):
+		return np.array([self.generator.predict(np.random.normal(0, 1, (1, self.n_noise)))
+			for k in range(n_samples)])
 
 
-
-class WGANCovertype:
-	def __init__(self):
-		self.n_features = 54
+### class to modify to take into account the categorical format of mushrooms
+class WGANMushroom():
+	def __init__(self, n_features=117, file="datasets/agaricus-lepiota.data"):
+		self.n_features = n_features
 		self.n_noise = 100
+		self.file = file
 
 		# Following parameter and optimizer set as recommended in paper
 		self.n_critic = 5
@@ -252,8 +283,9 @@ class WGANCovertype:
 		# (X_train, _), (_, _) = mnist.load_data()
 		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_mushroom
 		import os
+
 		self.dirname = os.path.dirname(__file__)
-		_, X_train = get_labels_contexts_mushroom(path=os.path.join(self.dirname,"datasets/covtype.data"))
+		_, X_train = get_labels_contexts_mushroom(path=os.path.join(self.dirname,self.file))
 
 
 		# Adversarial ground truths
@@ -297,11 +329,15 @@ class WGANCovertype:
 			g_loss = self.combined.train_on_batch(noise, valid)
 
 			# Plot the progress
-			print("%d [D loss: %f] [G loss: %f]" % (epoch, 1 - d_loss[0], 1 - g_loss[0]))
+			# print("%d [D loss: %f] [G loss: %f]" % (epoch, 1 - d_loss[0], 1 - g_loss[0]))
 
-
+	def generate_contexts(self, n_samples):
+		contexts = np.array([self.generator.predict(np.random.normal(0, 1, (1, self.n_noise)))
+						 for k in range(n_samples)])
+		return np.round(contexts)
 
 
 if __name__ == '__main__':
-	wgan = WGANCovertype()
+	wgan = WGANMushroom()
 	wgan.train(epochs=4000, batch_size=32, sample_interval=50)
+	print(wgan.generate_contexts(10))

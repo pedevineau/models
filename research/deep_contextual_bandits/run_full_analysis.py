@@ -57,7 +57,8 @@ from bandits.data.synthetic_data_sampler import sample_linear_data
 from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
 from bandits.data.environments import  *
 
-from bandits.data.bootstrap_thompson_sampling import generate_artificial_data
+from bandits.data.bootstrap_thompson_sampling import generate_uniform_artificial, gan_artificial_covertype,\
+    gan_artificial_mushroom, gan_artificial_linear, gan_artificial_wheel
 
 from bandits.algorithms.neural_linear_sampling import NeuralLinearPosteriorSampling
 from bandits.data.synthetic_data_sampler import sample_sparse_linear_data
@@ -79,12 +80,22 @@ if name=="linear":
     num_actions = 8
     context_dim = 10
     num_contexts = 1500
-    noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
+    # noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
     noise_stds = [1 for i in range(num_actions)]
+    from bandits.data.wasserstein_gans import WGANCovertype
+    wgan = WGANCovertype(context_dim, file="linear")
+    wgan.train(epochs=400, batch_size=32, sample_interval=50)
+    artificial_data_generator = lambda: gan_artificial_linear(wgan, n_samples=50, n_actions=num_actions)
+
 elif name=="mushroom":
     num_actions = 2
     context_dim = 117
     num_contexts = 3000
+    from bandits.data.wasserstein_gans import WGANMushroom
+    wgan = WGANMushroom(context_dim)
+    wgan.train(epochs=2000, batch_size=32, sample_interval=50)
+    artificial_data_generator = lambda: gan_artificial_mushroom(wgan, n_samples=50, n_actions=num_actions)
+
 elif name=="wheel":
     num_actions = 5
     context_dim = 2
@@ -94,10 +105,20 @@ elif name=="wheel":
     std_v = [0.05, 0.05, 0.05, 0.05, 0.05]
     mu_large = 50
     std_large = 0.01
+    from bandits.data.wasserstein_gans import WGANCovertype
+    wgan = WGANCovertype(context_dim, file="wheel")
+    wgan.train(epochs=1000, batch_size=32, sample_interval=50)
+    artificial_data_generator = lambda: gan_artificial_wheel(wgan, n_samples=50, n_actions=num_actions)
+
+
 elif name=="covertype":
     num_actions = 7
     context_dim = 54
     num_contexts = 3000
+    from bandits.data.wasserstein_gans import WGANCovertype
+    wgan = WGANCovertype(context_dim)
+    wgan.train(epochs=4000, batch_size=32, sample_interval=50)
+    artificial_data_generator = lambda: gan_artificial_covertype(wgan, n_samples=50, n_actions=num_actions)
 else:
     raise Exception('name not recognized')
 
@@ -109,11 +130,14 @@ def dataset_proto(name=name):
         dataset, opt_linear = sample_wheel_bandit_data(num_contexts, delta,
                                                       mean_v, std_v,
                                                       mu_large, std_large)
+
+
     elif name=="mushroom":
         mush = Mushrooms(num_contexts=num_contexts)
         dataset = mush.table
         opt_rewards, opt_actions = mush.opts[:,0], mush.opts[:,1]
         opt_linear = (opt_rewards, opt_actions)
+
     elif name=="covertype":
         cov = Covertype(num_contexts=num_contexts)
         dataset = cov.table
@@ -125,7 +149,6 @@ def dataset_proto(name=name):
 print(dataset_proto()[0].shape)
 
 
-artificial_data_generator = lambda : generate_artificial_data(n_samples=50, n_actions=num_actions, n_features=context_dim)
 # Params for algo templates
 hparams = tf.contrib.training.HParams(num_actions=num_actions)
 

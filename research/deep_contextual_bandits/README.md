@@ -29,5 +29,7 @@ Additions from the original project are :
 Some references:
 *[Deep Bayesian Bandits Showdown: An Empirical
 Comparison of Bayesian Deep Networks for Thompson
-Sampling](https://arxiv.org/abs/1802.09127)* 
+Sampling](https://arxiv.org/abs/1802.09127)* ,
+
+
 *[Bootstrapped Thompson Sampling and Deep Exploration](https://arxiv.org/pdf/1507.00300.pdf)* 

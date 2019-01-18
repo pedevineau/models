@@ -2,13 +2,15 @@
 
 from __future__ import print_function, division
 
-from keras.datasets import mnist
+# from keras.datasets import mnist
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers.advanced_activations import LeakyReLU, ReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop
+from bandits.data.environments import get_labels_contexts_mushroom
+from bandits.data.environments import get_labels_contexts_covertype
 
 import keras.backend as K
 
@@ -105,7 +107,6 @@ class WGANCovertype:
 
 		# Load the dataset
 		# (X_train, _), (_, _) = mnist.load_data()
-		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_covertype
 		import os
 		self.dirname = os.path.dirname(__file__)
 		if self.file == "linear":
@@ -281,7 +282,7 @@ class WGANMushroom():
 
 		# Load the dataset
 		# (X_train, _), (_, _) = mnist.load_data()
-		from models.research.deep_contextual_bandits.bandits.data.environments import get_labels_contexts_mushroom
+
 		import os
 
 		self.dirname = os.path.dirname(__file__)

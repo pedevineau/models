@@ -56,6 +56,7 @@ from bandits.algorithms.posterior_bnn_sampling import PosteriorBNNSampling
 from bandits.data.synthetic_data_sampler import sample_linear_data
 from bandits.data.synthetic_data_sampler import sample_wheel_bandit_data
 from bandits.data.environments import  *
+from bandits.data.wasserstein_gans import WGANCovertype
 
 from bandits.data.bootstrap_thompson_sampling import generate_uniform_artificial, gan_artificial_covertype,\
     gan_artificial_mushroom, gan_artificial_linear, gan_artificial_wheel
@@ -84,7 +85,7 @@ if name=="linear":
     num_contexts = 1500
     # noise_stds = [0.01 * (i + 1) for i in range(num_actions)]
     noise_stds = [1 for i in range(num_actions)]
-    from bandits.data.wasserstein_gans import WGANCovertype
+
     wgan = WGANCovertype(context_dim, file="linear")
     wgan.train(epochs=400, batch_size=32, sample_interval=50)
     artificial_data_generator = lambda: gan_artificial_linear(wgan, n_samples=50, n_actions=num_actions)
@@ -92,7 +93,7 @@ if name=="linear":
 elif name=="mushroom":
     num_actions = 2
     context_dim = 117
-    num_contexts = 3000
+    num_contexts = 1500
     from bandits.data.wasserstein_gans import WGANMushroom
     wgan = WGANMushroom(context_dim)
     wgan.train(epochs=2000, batch_size=32, sample_interval=50)
@@ -116,7 +117,7 @@ elif name=="wheel":
 elif name=="covertype":
     num_actions = 7
     context_dim = 54
-    num_contexts = 3000
+    num_contexts = 1500
     from bandits.data.wasserstein_gans import WGANCovertype
     wgan = WGANCovertype(context_dim)
     wgan.train(epochs=4000, batch_size=32, sample_interval=50)
@@ -472,7 +473,7 @@ algo_protos = [linUCB_proto,
 # Run experiments several times save and plot results
 benchmarker = Benchmarker(algo_protos, dataset_proto, num_actions, context_dim, nb_contexts=num_contexts, test_name=test_name)
 
-benchmarker.run_experiments(2)
+benchmarker.run_experiments(50)
 benchmarker.save_results('./results/')
 benchmarker.save_final_res_to_tex('./results/')
 benchmarker.display_results(save_path='./results/')

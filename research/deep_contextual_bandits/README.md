@@ -1,3 +1,5 @@
+@Authors: Mathieu-Prouveur and pedevineau
+
 # Deep Bayesian Bandits Library
 
 This library is a forked project from the github from the *[Deep Bayesian Bandits Showdown: An Empirical
@@ -24,3 +26,8 @@ Additions from the original project are :
 * Benchmarker class : allows to run exxperiments several times, display results in a png, store results in pickle, store algo performance in csv format (csv for later tex export) - DataReader class is the associated class that allows to read again the pickle file and process data once again.
 
  
+Some references:
+*[Deep Bayesian Bandits Showdown: An Empirical
+Comparison of Bayesian Deep Networks for Thompson
+Sampling](https://arxiv.org/abs/1802.09127)* 
+*[Bootstrapped Thompson Sampling and Deep Exploration](https://arxiv.org/pdf/1507.00300.pdf)* 
